@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Juicio de Salomón</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #B8860B;
+      --gold-light: #FAC775;
+      --gold-pale: #FAEEDA;
+      --gold-dark: #633806;
+      --parchment: #FDF8EE;
+      --ink: #1a1309;
+      --ink-soft: #4a3f2a;
+      --ink-muted: #8a7a62;
+      --border: rgba(184,134,11,0.2);
+      --border-strong: rgba(184,134,11,0.45);
+      --surface: #FFFFFF;
+      --page-bg: #F5EFE0;
+      --blue-fill: #E6F1FB;
+      --blue-text: #0C447C;
+      --amber-fill: #FAEEDA;
+      --amber-text: #633806;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--page-bg);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(184,134,11,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 90%, rgba(184,134,11,0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .crown-wrap {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--gold-pale);
+      border: 1px solid var(--border-strong);
+      margin-bottom: 1rem;
+      font-size: 36px;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(22px, 5vw, 30px);
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: var(--ink-muted);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    .gold-rule {
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 1.25rem auto;
+    }
+
+    /* Step bar */
+    .steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 2rem;
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .step-circle {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      color: var(--ink-muted);
+      transition: all 0.3s;
+    }
+
+    .step-circle.active {
+      background: var(--gold-pale);
+      border-color: var(--gold);
+      color: var(--gold-dark);
+      font-weight: 600;
+    }
+
+    .step-circle.done {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: white;
+    }
+
+    .step-label {
+      font-size: 10px;
+      color: var(--ink-muted);
+      letter-spacing: 0.05em;
+      font-family: 'Cinzel', serif;
+      white-space: nowrap;
+    }
+
+    .step-line {
+      width: 48px;
+      height: 1px;
+      background: var(--border-strong);
+      margin-bottom: 14px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .party-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 500;
+      font-family: 'Lora', serif;
+      flex-shrink: 0;
+    }
+
+    .badge-a { background: var(--blue-fill); color: var(--blue-text); }
+    .badge-b { background: var(--amber-fill); color: var(--amber-text); }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-bottom: 5px;
+      font-style: italic;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      font-family: 'Lora', Georgia, serif;
+      font-size: 14px;
+      color: var(--ink);
+      background: var(--parchment);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      line-height: 1.6;
+    }
+
+    input[type="text"] { margin-bottom: 0.75rem; }
+
+    input[type="text"]:focus, textarea:focus {
+      border-color: var(--gold);
+      background: #FFFEF9;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* Hint text */
+    .hint {
+      font-size: 13px;
+      color: var(--ink-muted);
+      font-style: italic;
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+      padding: 10px 14px;
+      border-left: 2px solid var(--gold-light);
+      background: var(--gold-pale);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    /* Buttons */
+    .btn-gold {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px;
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      letter-spacing: 0.07em;
+      color: var(--gold-dark);
+      background: var(--gold-pale);
+      border: 1px solid var(--gold-light);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+      margin-top: 1rem;
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-light);
+      box-shadow: 0 2px 12px rgba(184,134,11,0.15);
+    }
+
+    .btn-gold:active { transform: scale(0.98); }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      font-family: 'Lora', serif;
+      font-size: 13px;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-ghost:hover { background: var(--gold-pale); }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .btn-row .btn-gold { margin-top: 0; flex: 1; }
+
+    /* Error */
+    .error {
+      color: #A32D2D;
+      font-size: 13px;
+      font-style: italic;
+      text-align: center;
+      padding: 8px;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    /* Panels */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Loading */
+    .loading-wrap {
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+
+    .candle {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 1.5rem;
+      animation: flicker 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes flicker {
+      0%   { transform: scale(0.94) rotate(-3deg); opacity: 0.75; }
+      100% { transform: scale(1.06) rotate(3deg);  opacity: 1; }
+    }
+
+    .loading-title {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      color: var(--gold-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .loading-sub {
+      font-size: 13px;
+      color: var(--ink-muted);
+      font-style: italic;
+      line-height: 1.7;
+    }
+
+    /* Result */
+    .judgment-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .judgment-header {
+      background: var(--gold-pale);
+      border-bottom: 1px solid var(--border-strong);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .judgment-header-icon { font-size: 22px; }
+
+    .judgment-header-text {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--gold-dark);
+    }
+
+    .judgment-parties {
+      display: flex;
+      gap: 8px;
+      padding: 1rem 1.5rem 0;
+      flex-wrap: wrap;
+    }
+
+    .party-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-style: italic;
+    }
+
+    .party-tag-a { background: var(--blue-fill); color: var(--blue-text); }
+    .party-tag-b { background: var(--amber-fill); color: var(--amber-text); }
+
+    .judgment-body {
+      padding: 1.5rem;
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--ink-soft);
+      font-style: italic;
+      white-space: pre-wrap;
+    }
+
+    .judgment-seal {
+      text-align: center;
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--ink-muted);
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .result-actions .btn-ghost { flex: 1; justify-content: center; min-width: 120px; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 12px;
+      color: var(--ink-muted);
+      font-style: italic;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .page-wrap { padding: 1.5rem 1rem 3rem; }
+      h1 { font-size: 22px; }
+      .step-line { width: 28px; }
+    }
+
+    /* Print judgment */
+    @media print {
+      body { background: white; }
+      body::before { display: none; }
+      header, .steps, .result-actions, footer { display: none; }
+      .judgment-wrap { border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <header>
+    <div class="crown-wrap" aria-hidden="true">👑</div>
+    <h1>El Juicio de Salomón</h1>
+    <p class="tagline">"Escucha a ambos con el corazón,<br>y la verdad se revelará"</p>
+    <div class="gold-rule"></div>
+  </header>
+
+  <!-- Step indicator -->
+  <div class="steps" id="steps-bar">
+    <div class="step-item">
+      <div class="step-circle active" id="s1">I</div>
+      <span class="step-label">Las Partes</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-circle" id="s2">II</div>
+      <span class="step-label">Contexto</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-circle" id="s3">III</div>
+      <span class="step-label">El Juicio</span>
+    </div>
+  </div>
+
+  <!-- Panel 1: Las Partes -->
+  <div class="panel active" id="panel-1">
+    <p class="hint">Presenta el conflicto. El rey escuchará la voz de cada parte — su posición, su dolor, su verdad.</p>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="party-badge badge-a">A</span>
+        Primera Parte
+      </div>
+      <label>Nombre o rol (ej: yo, mi socio, mi madre...)</label>
+      <input type="text" id="name-a" placeholder="¿Quién es esta persona?" />
+      <label>Su voz — ¿qué dice, siente y defiende?</label>
+      <textarea id="voice-a" placeholder="Describe su posición, su argumento, su dolor o su verdad..."></textarea>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="party-badge badge-b">B</span>
+        Segunda Parte
+      </div>
+      <label>Nombre o rol</label>
+      <input type="text" id="name-b" placeholder="¿Quién es esta persona?" />
+      <label>Su voz — ¿qué dice, siente y defiende?</label>
+      <textarea id="voice-b" placeholder="Describe su posición, su argumento, su dolor o su verdad..."></textarea>
+    </div>
+
+    <p class="error" id="err-1">El rey necesita escuchar a ambas partes antes de juzgar.</p>
+    <button class="btn-gold" onclick="goStep2()">Continuar ante el Rey →</button>
+  </div>
+
+  <!-- Panel 2: Contexto -->
+  <div class="panel" id="panel-2">
+    <p class="hint">¿Hay algo más que el rey deba saber? Historia previa, lo que está en juego, emociones que no se han dicho...</p>
+
+    <div class="card">
+      <div class="card-title">Contexto adicional (opcional)</div>
+      <label>Escribe aquí si hay algo más, o deja en blanco</label>
+      <textarea id="extra" style="min-height:120px" placeholder="Historia de fondo, lo que está en juego, emociones no expresadas, intentos previos de resolver el conflicto..."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goStep1()">← Volver</button>
+      <button class="btn-gold" onclick="goJudge()">⚖️ Que el Rey juzgue</button>
+    </div>
+  </div>
+
+  <!-- Panel 3: Loading -->
+  <div class="panel" id="panel-loading">
+    <div class="loading-wrap">
+      <span class="candle" aria-hidden="true">🕯️</span>
+      <p class="loading-title">El Rey medita en silencio...</p>
+      <p class="loading-sub">Escuchando lo que las palabras dicen<br>y lo que el corazón calla...</p>
+    </div>
+  </div>
+
+  <!-- Panel 4: Resultado -->
+  <div class="panel" id="panel-result">
+    <div class="judgment-wrap">
+      <div class="judgment-header">
+        <span class="judgment-header-icon" aria-hidden="true">⚖️</span>
+        <span class="judgment-header-text">El Juicio del Rey Salomón</span>
+      </div>
+      <div class="judgment-parties" id="parties-display"></div>
+      <div class="judgment-body" id="judgment-text"></div>
+      <div class="judgment-seal">— Juzgado con sabiduría y corazón —</div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-ghost" onclick="printJudgment()">🖨 Imprimir</button>
+      <button class="btn-ghost" onclick="copyJudgment()">📋 Copiar</button>
+      <button class="btn-ghost" onclick="restart()">↩ Nuevo caso</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="gold-rule"></div>
+    "La sabiduría empieza por escuchar" — 1 Reyes 3:9
+  </footer>
+
+</div>
+
+<script>
+  const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE'; // ← Reemplaza con tu API key de Anthropic
+
+  function setStep(n) {
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById('s' + i);
+      el.className = 'step-circle' + (i < n ? ' done' : i === n ? ' active' : '');
+    }
+  }
+
+  function showPanel(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function goStep1() {
+    showPanel('panel-1');
+    setStep(1);
+  }
+
+  function goStep2() {
+    const a = document.getElementById('voice-a').value.trim();
+    const b = document.getElementById('voice-b').value.trim();
+    const err = document.getElementById('err-1');
+    if (!a || !b) { err.style.display = 'block'; return; }
+    err.style.display = 'none';
+    showPanel('panel-2');
+    setStep(2);
+  }
+
+  async function goJudge() {
+    const nameA = document.getElementById('name-a').value.trim() || 'Primera parte';
+    const nameB = document.getElementById('name-b').value.trim() || 'Segunda parte';
+    const voiceA = document.getElementById('voice-a').value.trim();
+    const voiceB = document.getElementById('voice-b').value.trim();
+    const extra  = document.getElementById('extra').value.trim();
+
+    showPanel('panel-loading');
+    setStep(3);
+
+    const systemPrompt = `Eres el Rey Salomón, el juez más sabio que haya existido. Juzgas con sabiduría antigua y corazón humano.
+
+Tu forma de juzgar:
+- Escuchas lo que SE DICE y lo que NO SE DICE — las emociones detrás de las palabras.
+- No buscas "quién tiene razón" sino qué es verdadero, justo y sanador para ambas partes.
+- Eres directo pero compasivo. No evitas decir verdades difíciles, pero las dices con gentileza.
+- Puedes reconocer cuando ambas partes tienen razón en algo, o cuando ambas se han equivocado.
+- Ofreces una resolución o camino a seguir, no solo un veredicto.
+- Hablas en primera persona como Salomón, con voz serena y profunda.
+- Tu respuesta tiene entre 220 y 380 palabras. No uses listas ni puntos — solo prosa fluida y sabia.
+- Termina con una frase breve de sabiduría o bendición para ambas partes.`;
+
+    const userMsg = `Ante mí se presenta el siguiente conflicto:
+
+PARTE A — ${nameA}:
+"${voiceA}"
+
+PARTE B — ${nameB}:
+"${voiceB}"${extra ? `\n\nContexto adicional:\n"${extra}"` : ''}
+
+Rey Salomón, escucha con el corazón y emite tu juicio sabio.`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userMsg }]
+        })
+      });
+
+      const data = await res.json();
+      const text = data.content?.find(b => b.type === 'text')?.text
+        || 'El rey guarda silencio. Por favor, inténtalo de nuevo.';
+
+      document.getElementById('parties-display').innerHTML =
+        `<span class="party-tag party-tag-a">A: ${escHtml(nameA)}</span>
+         <span class="party-tag party-tag-b">B: ${escHtml(nameB)}</span>`;
+
+      document.getElementById('judgment-text').textContent = text;
+      showPanel('panel-result');
+    } catch (e) {
+      document.getElementById('parties-display').innerHTML = '';
+      document.getElementById('judgment-text').textContent =
+        'El mensajero no pudo llegar al palacio. Verifica tu conexión e inténtalo de nuevo.';
+      showPanel('panel-result');
+    }
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function restart() {
+    ['name-a','name-b','voice-a','voice-b','extra'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('judgment-text').textContent = '';
+    document.getElementById('parties-display').innerHTML = '';
+    goStep1();
+  }
+
+  function printJudgment() { window.print(); }
+
+  function copyJudgment() {
+    const text = document.getElementById('judgment-text').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = event.target;
+      btn.textContent = '✓ Copiado';
+      setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
